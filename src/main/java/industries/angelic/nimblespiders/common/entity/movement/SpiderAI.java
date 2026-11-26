@@ -6,8 +6,8 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAILeapAtTarget;
 import net.minecraft.entity.ai.EntityAILookIdle;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAISwimming;
+import net.minecraft.entity.ai.EntityAITarget;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.monster.EntityIronGolem;
@@ -40,15 +40,62 @@ public final class SpiderAI {
         entity.targetTasks.addTask(3, new SpiderTarget(EntityIronGolem.class));
     }
 
-    private class SpiderTarget extends EntityAINearestAttackableTarget {
+    /**
+     * Vanilla's nearest-target task searches only 4 blocks up and down, and drops a target it hasn't seen for 3
+     * seconds. A climber goes after targets above it and rarely sees them while climbing, so it searches as high as it
+     * searches wide and keeps an unseen target while it still has a path to follow.
+     */
+    private class SpiderTarget extends EntityAITarget {
 
-        SpiderTarget(Class<? extends EntityLivingBase> target) {
-            super(entity, target, 0, true);
+        private final Class<? extends EntityLivingBase> targetClass;
+        private EntityLivingBase candidate;
+        private int unseenTicks;
+
+        SpiderTarget(Class<? extends EntityLivingBase> targetClass) {
+            super(entity, true);
+            this.targetClass = targetClass;
+            setMutexBits(1);
         }
 
         @Override
         public boolean shouldExecute() {
-            return entity.getBrightness(1) < 0.5F && super.shouldExecute();
+            if (entity.getBrightness(1) >= 0.5F) return false;
+            double range = getTargetDistance(), nearest = range * range;
+            candidate = null;
+            for (Object found : entity.worldObj
+                .getEntitiesWithinAABB(targetClass, entity.boundingBox.expand(range, range, range))) {
+                EntityLivingBase target = (EntityLivingBase) found;
+                double distance = entity.getDistanceSqToEntity(target);
+                if (distance < nearest && isSuitableTarget(target, false)) {
+                    nearest = distance;
+                    candidate = target;
+                }
+            }
+            return candidate != null;
+        }
+
+        @Override
+        public void startExecuting() {
+            entity.setAttackTarget(candidate);
+            unseenTicks = 0;
+            super.startExecuting();
+        }
+
+        @Override
+        public boolean continueExecuting() {
+            EntityLivingBase target = entity.getAttackTarget();
+            if (target == null || !target.isEntityAlive()) return false;
+            double range = getTargetDistance();
+            if (entity.getDistanceSqToEntity(target) > range * range) return false;
+            if (target instanceof EntityPlayer && ((EntityPlayer) target).capabilities.disableDamage) return false;
+            if (entity.getEntitySenses()
+                .canSee(target)) unseenTicks = 0;
+            else if (++unseenTicks > 60 && entity.getNavigator()
+                .noPath()) {
+                    SpiderClimber.get(entity).debug.event("TARGET_LOST reason=unseen_without_path");
+                    return false;
+                }
+            return true;
         }
     }
 

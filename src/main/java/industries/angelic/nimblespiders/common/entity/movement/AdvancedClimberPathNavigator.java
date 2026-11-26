@@ -2,6 +2,7 @@ package industries.angelic.nimblespiders.common.entity.movement;
 
 import java.util.List;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.pathfinding.PathEntity;
@@ -253,7 +254,11 @@ public class AdvancedClimberPathNavigator extends PathNavigate {
         double z = point.zCoord + Math.ceil(climber.width) / 2
             + side.offsetZ * (Math.ceil(climber.width) - climber.width) / 2;
         double dx = Math.abs(x - climber.posX), dy = Math.abs(y - climber.posY), dz = Math.abs(z - climber.posZ);
-        if (dx < (side.offsetX != 0 ? 0.6 : 0.35) && dy < (side.offsetY != 0 ? 0.6 : 0.35)
+        // Water cells are walkable at any depth, but a spider floats: a waypoint below it would keep it turning in
+        // place over the spot. For a waypoint in water, being above or below it is enough.
+        boolean inWater = climber.worldObj.getBlock(point.xCoord, point.yCoord, point.zCoord)
+            .getMaterial() == Material.water;
+        if (dx < (side.offsetX != 0 ? 0.6 : 0.35) && (inWater || dy < (side.offsetY != 0 ? 0.6 : 0.35))
             && dz < (side.offsetZ != 0 ? 0.6 : 0.35)) {
             path.incrementPathIndex();
             if (noPath()) return;
