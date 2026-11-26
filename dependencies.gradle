@@ -40,8 +40,11 @@ dependencies {
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:NotEnoughItems:2.9.13-GTNH:dev")
     runtimeOnlyNonPublishable(rfg.deobf("curse.maven:catalogue-vintage-1465746:8384975")) // 1.0.8-1.7.10
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:Angelica:2.2.46:dev")
-    runtimeOnlyNonPublishable("dev.dediamondpro.resourcify:VintageResourcify:1.0.5:dev")
-    runtimeOnlyNonPublishable("org.fentanylsolutions.vrap:vrap:1.0.1:dev")
+    runtimeOnlyNonPublishable("industries.angelic.angellib:AngelLib:1.0.4:dev")
+    runtimeOnlyNonPublishable("industries.angelic.vintageresourcify:VintageResourcify:1.0.6:dev") {
+        exclude group: "industries.angelic.angellib", module: "AngelLib"
+    }
+    runtimeOnlyNonPublishable("industries.angelic.vrap:vrap:1.0.2:dev")
     runtimeOnlyNonPublishable("com.falsepattern:forgelin-mc1.7.10:2.4.3-2.4.10")
 
     runtimeOnlyNonPublishable("com.github.GTNewHorizons:ModularUI2:2.4.3-1.7.10:dev") // Required by VintageResourcify

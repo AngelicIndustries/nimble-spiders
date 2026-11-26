@@ -1,9 +1,3 @@
-import net.darkhax.curseforgegradle.TaskPublishCurseForge
-
-tasks.withType<TaskPublishCurseForge>().configureEach {
-    uploadArtifacts.forEach { it.addEnvironment("Client", "Server") }
-}
-
 // Runs the dedicated-server integration fixture from test sources; never included in the release jar.
 if (providers.gradleProperty("spiderIntegration").isPresent) {
     val testSources = extensions.getByType<org.gradle.api.tasks.SourceSetContainer>().getByName("test")

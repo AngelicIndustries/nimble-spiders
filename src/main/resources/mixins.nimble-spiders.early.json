@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8.7-GTNH",
-  "package": "org.fentanylsolutions.nimblespiders.mixins.early",
+  "package": "industries.angelic.nimblespiders.mixins.early",
   "refmap": "mixins.nimble-spiders.refmap.json",
   "target": "@env(DEFAULT)",
   "compatibilityLevel": "JAVA_8"

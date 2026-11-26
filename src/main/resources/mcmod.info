@@ -5,7 +5,7 @@
     "description": "Spiders walk along walls and ceilings and navigate around obstacles. Minecraft 1.7.10 backport of Spiders 2.0 / Nyf's Spiders.",
     "version": "${modVersion}",
     "mcversion": "${minecraftVersion}",
-    "url": "https://github.com/JackOfNoneTrades/nimble-spiders",
+    "url": "https://github.com/AngelicIndustries/nimble-spiders",
     "authorList": [
       "TheCyberBrick",
       "Nyfaria",
